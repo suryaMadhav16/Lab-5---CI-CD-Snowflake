@@ -14,8 +14,8 @@ snowpark:
           type: "string"
         - name: "type"
           type: "string"
-          default: "'email'"
+          default: "email"
         - name: "level"
           type: "string"
-          default: "'medium'"
+          default: "medium"
       returns: string
