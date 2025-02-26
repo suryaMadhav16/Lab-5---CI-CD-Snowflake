@@ -1,6 +1,7 @@
 definition_version: 1
 snowpark:
   project_name: "cicd_lab"
+  # Use fully qualified stage name - this will be modified by the GitHub Action
   stage_name: "data_security.deployment"
   src: "data_masker/"
   functions:

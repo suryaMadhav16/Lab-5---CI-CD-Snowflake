@@ -50,13 +50,24 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "ENVIRONMENT=prod" >> $GITHUB_ENV
-            echo "DB_NAME=CICD_LAB_PROD" >> $GITHUB_ENV
+            echo "SNOWFLAKE_DATABASE=CICD_LAB_PROD" >> $GITHUB_ENV
           else
             echo "ENVIRONMENT=dev" >> $GITHUB_ENV
-            echo "DB_NAME=CICD_LAB_DEV" >> $GITHUB_ENV
+            echo "SNOWFLAKE_DATABASE=CICD_LAB_DEV" >> $GITHUB_ENV
+          fi
+          # Ensure warehouse is set to a default if not provided
+          if [ -z "$SNOWFLAKE_WAREHOUSE" ]; then
+            echo "SNOWFLAKE_WAREHOUSE=CICD_LAB_WH" >> $GITHUB_ENV
           fi
       - name: Deploy Data Masking UDF
         run: |
           cd src/data_masker
+          # Show environment for debugging
+          echo "Using database: $SNOWFLAKE_DATABASE"
+          echo "Using warehouse: $SNOWFLAKE_WAREHOUSE"
+          
+          # Ensure we use the fully qualified stage name
+          sed -i "s|stage_name: \"data_security.deployment\"|stage_name: \"$SNOWFLAKE_DATABASE.data_security.deployment\"|g" snowflake.yml
+          
           snow snowpark build --temporary-connection
           snow snowpark deploy --replace --temporary-connection
